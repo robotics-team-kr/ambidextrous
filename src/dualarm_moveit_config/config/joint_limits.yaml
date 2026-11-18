@@ -1,0 +1,96 @@
+# Velocity/acceleration limits MoveIt uses for time parameterization.
+# Scaling factors below are the defaults when a request does not set its own.
+default_velocity_scaling_factor: 0.3
+default_acceleration_scaling_factor: 0.3
+
+joint_limits:
+  left_panda_joint1:
+    has_velocity_limits: true
+    max_velocity: 2.175
+    has_acceleration_limits: true
+    max_acceleration: 3.75
+  left_panda_joint2:
+    has_velocity_limits: true
+    max_velocity: 2.175
+    has_acceleration_limits: true
+    max_acceleration: 1.875
+  left_panda_joint3:
+    has_velocity_limits: true
+    max_velocity: 2.175
+    has_acceleration_limits: true
+    max_acceleration: 2.5
+  left_panda_joint4:
+    has_velocity_limits: true
+    max_velocity: 2.175
+    has_acceleration_limits: true
+    max_acceleration: 3.125
+  left_panda_joint5:
+    has_velocity_limits: true
+    max_velocity: 2.61
+    has_acceleration_limits: true
+    max_acceleration: 3.75
+  left_panda_joint6:
+    has_velocity_limits: true
+    max_velocity: 2.61
+    has_acceleration_limits: true
+    max_acceleration: 5.0
+  left_panda_joint7:
+    has_velocity_limits: true
+    max_velocity: 2.61
+    has_acceleration_limits: true
+    max_acceleration: 5.0
+  left_panda_finger_joint1:
+    has_velocity_limits: true
+    max_velocity: 0.1
+    has_acceleration_limits: false
+    max_acceleration: 0.0
+  left_panda_finger_joint2:
+    has_velocity_limits: true
+    max_velocity: 0.1
+    has_acceleration_limits: false
+    max_acceleration: 0.0
+  right_panda_joint1:
+    has_velocity_limits: true
+    max_velocity: 2.175
+    has_acceleration_limits: true
+    max_acceleration: 3.75
+  right_panda_joint2:
+    has_velocity_limits: true
+    max_velocity: 2.175
+    has_acceleration_limits: true
+    max_acceleration: 1.875
+  right_panda_joint3:
+    has_velocity_limits: true
+    max_velocity: 2.175
+    has_acceleration_limits: true
+    max_acceleration: 2.5
+  right_panda_joint4:
+    has_velocity_limits: true
+    max_velocity: 2.175
+    has_acceleration_limits: true
+    max_acceleration: 3.125
+  right_panda_joint5:
+    has_velocity_limits: true
+    max_velocity: 2.61
+    has_acceleration_limits: true
+    max_acceleration: 3.75
+  right_panda_joint6:
+    has_velocity_limits: true
+    max_velocity: 2.61
+    has_acceleration_limits: true
+    max_acceleration: 5.0
+  right_panda_joint7:
+    has_velocity_limits: true
+    max_velocity: 2.61
+    has_acceleration_limits: true
+    max_acceleration: 5.0
+  right_panda_finger_joint1:
+    has_velocity_limits: true
+    max_velocity: 0.1
+    has_acceleration_limits: false
+    max_acceleration: 0.0
+  right_panda_finger_joint2:
+    has_velocity_limits: true
+    max_velocity: 0.1
+    has_acceleration_limits: false
+    max_acceleration: 0.0

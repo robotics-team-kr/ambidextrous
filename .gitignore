@@ -1,0 +1,15 @@
+# colcon 빌드 결과물
+build/
+install/
+log/
+
+# Python 캐시
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# 평가 결과 CSV
+results/
+
+# 개인 설정
+.claude/settings.local.json

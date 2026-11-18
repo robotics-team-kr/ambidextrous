@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- One position-controlled arm joint. initial is where it starts in Gazebo. -->
+  <xacro:macro name="arm_joint" params="name initial">
+    <joint name="${name}">
+      <command_interface name="position"/>
+      <state_interface name="position">
+        <param name="initial_value">${initial}</param>
+      </state_interface>
+      <state_interface name="velocity"/>
+    </joint>
+  </xacro:macro>
+
+  <!-- Arms start in the "ready" pose (same values as the SRDF group state). -->
+  <xacro:macro name="panda_arm_interfaces" params="prefix">
+    <xacro:arm_joint name="${prefix}panda_joint1" initial="0.0"/>
+    <xacro:arm_joint name="${prefix}panda_joint2" initial="-0.785"/>
+    <xacro:arm_joint name="${prefix}panda_joint3" initial="0.0"/>
+    <xacro:arm_joint name="${prefix}panda_joint4" initial="-2.356"/>
+    <xacro:arm_joint name="${prefix}panda_joint5" initial="0.0"/>
+    <xacro:arm_joint name="${prefix}panda_joint6" initial="1.571"/>
+    <xacro:arm_joint name="${prefix}panda_joint7" initial="0.785"/>
+
+    <!-- Fingers start open. joint2 follows joint1: Gazebo Fortress ignores the URDF
+         <mimic> tag, so gz_ros2_control does the mimicking (the "mimic" param below). -->
+    <joint name="${prefix}panda_finger_joint1">
+      <command_interface name="position"/>
+      <state_interface name="position">
+        <param name="initial_value">0.04</param>
+      </state_interface>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="${prefix}panda_finger_joint2">
+      <param name="mimic">${prefix}panda_finger_joint1</param>
+      <param name="multiplier">1</param>
+      <command_interface name="position"/>
+      <state_interface name="position">
+        <param name="initial_value">0.04</param>
+      </state_interface>
+      <state_interface name="velocity"/>
+    </joint>
+  </xacro:macro>
+
+  <xacro:macro name="dual_panda_ros2_control" params="controllers_file position_gain">
+    <ros2_control name="GazeboSimSystem" type="system">
+      <hardware>
+        <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+      </hardware>
+      <xacro:panda_arm_interfaces prefix="left_"/>
+      <xacro:panda_arm_interfaces prefix="right_"/>
+    </ros2_control>
+
+    <gazebo>
+      <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+        <parameters>${controllers_file}</parameters>
+        <!-- Position commands become velocity = gain * error * update_rate. -->
+        <position_proportional_gain>${position_gain}</position_proportional_gain>
+      </plugin>
+    </gazebo>
+  </xacro:macro>
+</robot>

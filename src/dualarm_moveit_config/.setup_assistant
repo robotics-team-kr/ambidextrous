@@ -1,0 +1,6 @@
+moveit_setup_assistant_config:
+  urdf:
+    package: dualarm_description
+    relative_path: urdf/dual_panda.urdf.xacro
+  srdf:
+    relative_path: config/dual_panda.srdf
