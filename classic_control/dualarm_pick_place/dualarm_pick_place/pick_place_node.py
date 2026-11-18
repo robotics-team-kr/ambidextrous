@@ -1,39 +1,39 @@
-"""Pick the cube once from wherever it is and place it on the target.
+"""큐브를 한 번 집어서 목표 위치에 놓습니다.
 
     ros2 run dualarm_pick_place pick_place
     ros2 run dualarm_pick_place pick_place --ros-args -p arm:=left
 """
-from __future__ import annotations
-
 import sys
 
 from .app import App
-from .object_pose import get_object_pose
 from .trials import check_placement
 
 
-def main() -> int:
+def main():
     app = App('pick_place')
     try:
         app.wait_until_ready()
         app.pick_place.go_home()
 
-        object_pose = get_object_pose(app.objects)
-        x, y, z = object_pose.position
+        # 1) 큐브가 어디 있는지 알아냅니다.
+        cube_pose = app.objects.wait_until_still()
+        x, y, z = cube_pose.position
         app.log.info(f'object at x={x:.3f} y={y:.3f} z={z:.3f}')
 
-        result = app.pick_place.run(object_pose, app.arm.place_xy)
+        # 2) 집어서 옮깁니다.
+        failed_stage, reason = app.pick_place.run(cube_pose, app.arm.place_xy)
+        if failed_stage:
+            app.log.error(f'FAILED at {failed_stage}: {reason}')
+            return 1
+
+        # 3) 동작이 끝까지 됐더라도, 큐브가 실제로 목표에 놓였는지 시뮬레이터로 확인합니다.
         check = check_placement(app.objects.wait_until_still(), app.arm.place_xy)
-        success = result.completed and check.success
-        if success:
-            app.log.info(f'SUCCESS: placed {check.xy_error * 100:.1f} cm from the target '
-                         f'in {result.duration:.1f} s')
-        else:
-            why = result.message if not result.completed else check.reason
-            app.log.error(f'FAILED at {result.failed_stage or "placement check"}: {why}')
-        if result.completed:
-            app.pick_place.go_home()
-        return 0 if success else 1
+        app.pick_place.go_home()
+        if not check.success:
+            app.log.error(f'FAILED at placement check: {check.reason}')
+            return 1
+        app.log.info(f'SUCCESS: placed {check.xy_error * 100:.1f} cm from the target')
+        return 0
     finally:
         app.shutdown()
 
