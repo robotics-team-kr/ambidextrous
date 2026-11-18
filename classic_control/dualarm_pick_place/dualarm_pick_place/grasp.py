@@ -1,19 +1,14 @@
-"""Step 4: from an object pose to the gripper poses that pick it up.
+"""4단계: 큐브 자세로부터 "그리퍼를 어디로 보내야 집을 수 있는지" 계산.
 
-Strategy: top-down grasp. The gripper points straight down, its fingers close
-across two opposite faces of the cube, and the point between the finger pads
-(the TCP) ends up at the cube centre.
+방법: 위에서 아래로 집기. 그리퍼가 똑바로 아래를 보고, 두 손가락이 큐브의
+마주 보는 두 면을 잡습니다. 두 손가락 사이의 가운데 점(TCP)이 큐브 중심에 오게 합니다.
 
-Everything here is plain math so it can be unit-tested without ROS.
+여기는 순수한 계산뿐이라 ROS 없이 테스트할 수 있습니다 (test/test_grasp.py).
 """
-from __future__ import annotations
-
 import math
-from dataclasses import dataclass
 
 from .geometry import (
     Pose,
-    Quat,
     box_face_yaw,
     box_tilt,
     quat_from_axis_angle,
@@ -22,61 +17,54 @@ from .geometry import (
     wrap_to,
 )
 
-# Panda hand geometry (see dualarm_description/urdf/panda_arm.xacro).
-TCP_OFFSET = 0.1034              # flange/hand origin -> point between the finger pads, along hand z
-FLANGE_TO_HAND_YAW = -math.pi / 4  # the hand is mounted rotated about the flange z-axis
-FINGER_OPEN_POSITION = 0.04      # each finger 4 cm from the centre -> 8 cm gap
+# Panda 손의 치수 (common/dualarm_description/urdf/panda_arm.xacro 와 같아야 함).
+TCP_OFFSET = 0.1034                 # 손목에서 두 손가락 사이 가운데 점(TCP)까지 거리 [m]
+FLANGE_TO_HAND_YAW = -math.pi / 4   # 손은 손목에 45도 돌아간 채로 달려 있습니다
+FINGER_OPEN_POSITION = 0.04         # 손가락 하나가 중심에서 4 cm -> 벌린 폭 8 cm
 FINGER_CLOSED_POSITION = 0.0
 
-# A cube looks the same every 90 degrees about the vertical.
-CUBE_YAW_SYMMETRY = math.pi / 2
+Z_AXIS = (0.0, 0.0, 1.0)
 
 
 class GraspError(ValueError):
-    """The object pose cannot be grasped with the top-down strategy."""
+    """위에서 집기로는 잡을 수 없는 자세일 때 (예: 큐브가 기울어져 있음)."""
 
 
-@dataclass(frozen=True)
 class GraspPlan:
-    """TCP poses for the pick, all with the same top-down orientation."""
+    """집을 때 TCP 가 거쳐 갈 세 자세. 방향은 셋 다 같고 높이만 다릅니다."""
 
-    pregrasp: Pose   # above the object, fingers clear of it
-    grasp: Pose      # TCP at the object centre
-    lift: Pose       # straight up after closing
-    yaw: float       # gripper rotation about the vertical
+    def __init__(self, pregrasp, grasp, lift, yaw):
+        self.pregrasp = pregrasp   # 큐브 바로 위 (아직 닿지 않음)
+        self.grasp = grasp         # TCP 가 큐브 중심에 온 자세
+        self.lift = lift           # 잡은 뒤 똑바로 들어 올린 자세
+        self.yaw = yaw             # 그리퍼를 위에서 봤을 때 돌린 각도
 
 
-def top_down_orientation(yaw: float) -> Quat:
-    """Gripper pointing down (hand z = -world z), rotated by yaw about the vertical.
+def top_down_orientation(yaw):
+    """그리퍼가 아래를 향하고, 위에서 봤을 때 yaw 만큼 돌아간 방향.
 
-    At yaw = 0 the hand's x-axis is world +x and the fingers open/close along world y,
-    which is the orientation of the 'ready' pose.
+    yaw = 0 이면 손가락이 y 방향으로 열리고 닫힙니다 ('ready' 자세와 같은 방향).
     """
-    flip = quat_from_axis_angle((1.0, 0.0, 0.0), math.pi)
-    spin = quat_from_axis_angle((0.0, 0.0, 1.0), yaw)
+    flip = quat_from_axis_angle((1.0, 0.0, 0.0), math.pi)   # 뒤집어서 아래를 보게
+    spin = quat_from_axis_angle(Z_AXIS, yaw)                # 수직축으로 yaw 만큼 회전
     return quat_multiply(spin, flip)
 
 
-def choose_grasp_yaw(object_yaw: float, preferred_yaw: float = 0.0,
-                     symmetry: float = CUBE_YAW_SYMMETRY) -> float:
-    """Pick the gripper yaw that squares up with the object's faces.
+def choose_grasp_yaw(object_yaw, preferred_yaw=0.0):
+    """큐브 면과 손가락이 나란해지는 각도 중, 손목을 가장 덜 돌려도 되는 것을 고릅니다.
 
-    Any yaw equal to the object's yaw modulo `symmetry` grips flat faces; of those,
-    return the one closest to preferred_yaw so the wrist turns as little as possible.
+    큐브는 90도마다 똑같이 생겼으므로, 100도 돌아간 큐브는 10도 돌아간 것처럼 잡으면 됩니다.
     """
-    return preferred_yaw + wrap_to(object_yaw - preferred_yaw, symmetry)
+    return preferred_yaw + wrap_to(object_yaw - preferred_yaw, math.pi / 2)
 
 
-def plan_top_down_grasp(object_pose: Pose, *, approach_height: float = 0.12,
-                        lift_height: float = 0.15, preferred_yaw: float = 0.0,
-                        max_tilt: float = math.radians(10.0)) -> GraspPlan:
-    """Compute pregrasp / grasp / lift TCP poses for a cube resting on a surface."""
+def plan_top_down_grasp(object_pose, approach_height=0.12, lift_height=0.15):
+    """테이블 위 큐브를 집기 위한 세 자세(접근 / 집기 / 들기)를 계산합니다."""
     tilt = box_tilt(object_pose.orientation)
-    if tilt > max_tilt:
-        # No face is level: the cube is leaning on something.
+    if tilt > math.radians(10.0):
         raise GraspError(f'object is tilted {math.degrees(tilt):.1f} deg; top-down grasp needs it flat')
 
-    yaw = choose_grasp_yaw(box_face_yaw(object_pose.orientation), preferred_yaw)
+    yaw = choose_grasp_yaw(box_face_yaw(object_pose.orientation))
     orientation = top_down_orientation(yaw)
     x, y, z = object_pose.position
     return GraspPlan(
@@ -87,13 +75,20 @@ def plan_top_down_grasp(object_pose: Pose, *, approach_height: float = 0.12,
     )
 
 
-def tcp_to_flange(tcp_pose: Pose) -> Pose:
-    """Convert a desired TCP pose into the pose of the arm's tip link (panda_link8).
+def tcp_to_flange(tcp_pose):
+    """"TCP 를 여기로 보내고 싶다" -> "그러려면 손목(link8)은 어디에 있어야 하나".
 
-    MoveIt plans for the planning group's tip link, so every TCP target goes through
-    this before it is sent.
+    MoveIt 은 손가락 끝이 아니라 손목 링크를 기준으로 계획합니다. 그래서 목표를
+    보내기 전에 항상 이 함수로 바꿉니다.
+      1. 위치: 손이 향하는 방향의 반대로 TCP_OFFSET 만큼 물러납니다.
+      2. 방향: 손이 손목에 45도 돌아가 달려 있으므로 그만큼 되돌립니다.
     """
-    hand_z = rotate_vector(tcp_pose.orientation, (0.0, 0.0, 1.0))
-    position = tuple(p - TCP_OFFSET * a for p, a in zip(tcp_pose.position, hand_z))
-    undo_mount = quat_from_axis_angle((0.0, 0.0, 1.0), -FLANGE_TO_HAND_YAW)
+    hand_direction = rotate_vector(tcp_pose.orientation, Z_AXIS)
+    x, y, z = tcp_pose.position
+    position = (
+        x - TCP_OFFSET * hand_direction[0],
+        y - TCP_OFFSET * hand_direction[1],
+        z - TCP_OFFSET * hand_direction[2],
+    )
+    undo_mount = quat_from_axis_angle(Z_AXIS, -FLANGE_TO_HAND_YAW)
     return Pose(position, quat_multiply(tcp_pose.orientation, undo_mount))

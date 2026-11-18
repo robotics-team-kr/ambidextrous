@@ -92,13 +92,13 @@ classic_control/
 | 팔이 명령을 늦게 따라감 | launch 인자 `position_gain:=0.3` (기본 0.1) |
 | 실행 중 시간 초과로 중단 | [moveit_controllers.yaml](dualarm_moveit_config/config/moveit_controllers.yaml)의 `allowed_execution_duration_scaling` |
 | 계획 실패가 잦음 | [moveit_client.py](dualarm_pick_place/dualarm_pick_place/moveit_client.py)의 `allowed_planning_time`, `num_planning_attempts` |
-| 움직임이 너무 빠름/느림 | `MoveItClient`의 `velocity_scaling`, `linear_velocity_scaling` |
+| 움직임이 너무 빠름/느림 | [moveit_client.py](dualarm_pick_place/dualarm_pick_place/moveit_client.py) 맨 위 `FREE_SPEED`, `LINEAR_SPEED` |
 
 실패한 시행은 CSV의 `failed_stage` 열에 어느 단계에서 멈췄는지 남습니다.
 
 ## 설계 메모
 
-- **위치 받기 분리**: 집기 코드는 `get_object_pose(source)`만 호출합니다. 지금 `source`는 Gazebo의 실제 큐브 자세이고, 카메라를 쓸 때는 같은 메서드 두 개(`latest`, `wait_until_still`)를 가진 클래스를 만들어 [app.py](dualarm_pick_place/dualarm_pick_place/app.py)에서 바꿔 끼우면 됩니다.
+- **위치 받기 분리**: 큐브 위치는 [object_pose.py](dualarm_pick_place/dualarm_pick_place/object_pose.py)의 `SimObjectPoseSource`에서만 받습니다. 지금은 Gazebo의 실제 큐브 자세이고, 카메라를 쓸 때는 같은 메서드 두 개(`latest`, `wait_until_still`)를 가진 클래스를 만들어 [app.py](dualarm_pick_place/dualarm_pick_place/app.py)에서 바꿔 끼우면 됩니다.
 - **큐브는 MoveIt 충돌 장면에 넣지 않았습니다.** 테이블만 넣었습니다. 접근·들기·옮기기를 큐브 위쪽에서 직선으로 하기 때문에 지금은 필요 없지만, 장애물이 늘면 추가해야 합니다.
 - **쓰지 않는 팔**은 ready 자세로 가만히 있고, MoveIt이 팔끼리의 충돌을 검사합니다.
 - **성공 판정**은 시퀀스 완료 여부와 별개로 시뮬레이터의 최종 큐브 위치로 합니다.
