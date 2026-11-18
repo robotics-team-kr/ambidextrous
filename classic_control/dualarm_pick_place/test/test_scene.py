@@ -12,13 +12,15 @@ from pathlib import Path
 from dualarm_pick_place import scene
 from dualarm_pick_place.grasp import FINGER_OPEN_POSITION, FLANGE_TO_HAND_YAW, TCP_OFFSET
 
-SRC = Path(__file__).resolve().parents[2]
-WORLD = SRC / 'dualarm_description' / 'worlds' / 'pick_place.sdf'
-ARM_XACRO = SRC / 'dualarm_description' / 'urdf' / 'panda_arm.xacro'
-CONTROL_XACRO = SRC / 'dualarm_description' / 'urdf' / 'dual_panda.ros2_control.xacro'
-CONTROLLERS = SRC / 'dualarm_description' / 'config' / 'ros2_controllers.yaml'
-SRDF = SRC / 'dualarm_moveit_config' / 'config' / 'dual_panda.srdf'
-MOVEIT_CONTROLLERS = SRC / 'dualarm_moveit_config' / 'config' / 'moveit_controllers.yaml'
+REPO = Path(__file__).resolve().parents[3]
+DESCRIPTION = REPO / 'common' / 'dualarm_description'
+MOVEIT_CONFIG = REPO / 'classic_control' / 'dualarm_moveit_config'
+WORLD = DESCRIPTION / 'worlds' / 'pick_place.sdf'
+ARM_XACRO = DESCRIPTION / 'urdf' / 'panda_arm.xacro'
+CONTROL_XACRO = DESCRIPTION / 'urdf' / 'dual_panda.ros2_control.xacro'
+CONTROLLERS = DESCRIPTION / 'config' / 'ros2_controllers.yaml'
+SRDF = MOVEIT_CONFIG / 'config' / 'dual_panda.srdf'
+MOVEIT_CONTROLLERS = MOVEIT_CONFIG / 'config' / 'moveit_controllers.yaml'
 
 XACRO_NS = '{http://www.ros.org/wiki/xacro}'
 

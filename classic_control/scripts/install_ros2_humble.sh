@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ROS 2 Humble + MoveIt 2 + Gazebo Fortress 설치 (Ubuntu 22.04 "jammy" 전용).
 #
-#   sudo bash scripts/install_ros2_humble.sh
+#   sudo bash classic_control/scripts/install_ros2_humble.sh
 #
 # 하는 일:
 #   1. ROS 2 apt 저장소(jammy)가 없으면 추가합니다. 이미 있으면 건드리지 않습니다.
@@ -47,4 +47,4 @@ apt-get install -y \
 echo
 echo "설치 완료. 새 터미널에서:"
 echo "  source /opt/ros/humble/setup.bash"
-echo "  cd $(dirname "$(dirname "$(readlink -f "$0")")") && colcon build --symlink-install"
+echo "  cd $(dirname "$(dirname "$(dirname "$(readlink -f "$0")")")") && colcon build --symlink-install"
