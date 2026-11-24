@@ -33,11 +33,10 @@ class GraspError(ValueError):
 class GraspPlan:
     """집을 때 TCP 가 거쳐 갈 세 자세. 방향은 셋 다 같고 높이만 다릅니다."""
 
-    def __init__(self, pregrasp, grasp, lift, yaw):
+    def __init__(self, pregrasp, grasp, lift):
         self.pregrasp = pregrasp   # 큐브 바로 위 (아직 닿지 않음)
         self.grasp = grasp         # TCP 가 큐브 중심에 온 자세
         self.lift = lift           # 잡은 뒤 똑바로 들어 올린 자세
-        self.yaw = yaw             # 그리퍼를 위에서 봤을 때 돌린 각도
 
 
 def top_down_orientation(yaw):
@@ -58,8 +57,11 @@ def choose_grasp_yaw(object_yaw, preferred_yaw=0.0):
     return preferred_yaw + wrap_to(object_yaw - preferred_yaw, math.pi / 2)
 
 
-def plan_top_down_grasp(object_pose, approach_height=0.12, lift_height=0.15):
-    """테이블 위 큐브를 집기 위한 세 자세(접근 / 집기 / 들기)를 계산합니다."""
+def plan_top_down_grasp(object_pose, approach_height, lift_height):
+    """테이블 위 큐브를 집기 위한 세 자세(접근 / 집기 / 들기)를 계산합니다.
+
+    approach_height, lift_height 는 큐브 중심에서 위로 잰 높이 [m] 입니다.
+    """
     tilt = box_tilt(object_pose.orientation)
     if tilt > math.radians(10.0):
         raise GraspError(f'object is tilted {math.degrees(tilt):.1f} deg; top-down grasp needs it flat')
@@ -71,7 +73,6 @@ def plan_top_down_grasp(object_pose, approach_height=0.12, lift_height=0.15):
         pregrasp=Pose((x, y, z + approach_height), orientation),
         grasp=Pose((x, y, z), orientation),
         lift=Pose((x, y, z + lift_height), orientation),
-        yaw=yaw,
     )
 
 

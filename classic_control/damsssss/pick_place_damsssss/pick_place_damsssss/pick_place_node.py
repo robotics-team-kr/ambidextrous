@@ -1,7 +1,7 @@
 """큐브를 한 번 집어서 목표 위치에 놓습니다.
 
-    ros2 run dualarm_pick_place pick_place
-    ros2 run dualarm_pick_place pick_place --ros-args -p arm:=left
+    ros2 run pick_place_damsssss pick_place
+    ros2 run pick_place_damsssss pick_place --ros-args -p arm:=left
 """
 import sys
 

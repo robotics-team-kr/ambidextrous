@@ -3,7 +3,7 @@
   Pick & place world. Frame: the robot's "world" link sits at this world's origin.
 
   The numbers here (table, cube, place target) are mirrored in
-  dualarm_pick_place/dualarm_pick_place/scene.py; test_scene.py checks they agree.
+  classic_control/damsssss/pick_place_damsssss/pick_place_damsssss/scene.py; test_scene.py checks they agree.
 
   Gazebo Fortress (ROS 2 Humble): system plugins use the ignition-gazebo-* names.
 -->

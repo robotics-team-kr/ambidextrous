@@ -1,11 +1,11 @@
 """Everything the pick & place needs: Gazebo + controllers + MoveIt.
 
-    ros2 launch dualarm_pick_place sim.launch.py
-    ros2 launch dualarm_pick_place sim.launch.py headless:=true rviz:=true
+    ros2 launch pick_place_damsssss sim.launch.py
+    ros2 launch pick_place_damsssss sim.launch.py headless:=true rviz:=true
 
 Then, in another terminal:
-    ros2 run dualarm_pick_place pick_place
-    ros2 run dualarm_pick_place evaluate --ros-args -p case:=1
+    ros2 run pick_place_damsssss pick_place
+    ros2 run pick_place_damsssss evaluate --ros-args -p case:=1
 """
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription

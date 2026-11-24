@@ -51,8 +51,3 @@ class ArmScene:
         half_x = RANDOM_REGION_SIZE[0] / 2.0
         half_y = RANDOM_REGION_SIZE[1] / 2.0
         self.region_bounds = (0.5 - half_x, 0.5 + half_x, y - half_y, y + half_y)
-
-
-def arm_scene(side):
-    """'right' 또는 'left' 팔의 설정을 만듭니다."""
-    return ArmScene(side)

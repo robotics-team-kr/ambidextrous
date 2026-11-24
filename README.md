@@ -6,9 +6,9 @@
 
 | 폴더 | 담당 | 내용 |
 |---|---|---|
-| [common/](common/) | 공용 | 로봇 모델, Gazebo 월드, 컨트롤러 설정 ([dualarm_description](common/dualarm_description/)) |
-| [classic_control/](classic_control/) | 고전제어팀 | MoveIt 2 기반 pick & place, 성공률 측정 |
-| [rl/](rl/) | 강화학습팀 | 아직 비어 있음 |
+| [common/](common/) | 공용 | 로봇 모델, Gazebo 월드, 컨트롤러 설정 ([dualarm_description](common/dualarm_description/)). 강화학습팀은 이 중 로봇 모델만 씀 |
+| [classic_control/](classic_control/) | 고전제어팀 | MoveIt 2 기반 pick & place, 성공률 측정. 사람별 구현이 [damsssss/](classic_control/damsssss/), [son/](classic_control/son/)에 있음 |
+| [rl/](rl/) | 강화학습팀 | Isaac Lab 사용. 아직 비어 있음 |
 
 각 팀은 자기 폴더 안에서 자유롭게 작업합니다. `common/`과 아래 비교 조건은 두 팀의 결과에 모두 영향을 주므로, 바꿀 때는 PR로 상대 팀 확인을 받습니다.
 
@@ -27,12 +27,13 @@
 
 | 방식 | Case 1 | Case 2 | 비고 |
 |---|---|---|---|
-| 고전제어 | 9/10 | 9/10 | 오른팔, GUI 없이 실행, 2026-11-19. 자세한 내용은 [classic_control/README.md](classic_control/README.md) |
+| 고전제어 (damsssss) | 9/10 | 9/10 | 오른팔, GUI 없이 실행, 2026-11-19. 자세한 내용은 [classic_control/damsssss/README.md](classic_control/damsssss/README.md) |
+| 고전제어 (son) | — | — | |
 | 강화학습 | — | — | |
 
 ## 빌드
 
-저장소 최상위 폴더가 colcon 워크스페이스입니다. 환경은 Ubuntu 22.04 + ROS 2 Humble + Gazebo Fortress입니다.
+저장소 최상위 폴더가 colcon 워크스페이스입니다. `common/`과 `classic_control/`의 ROS 패키지를 빌드하며, 환경은 Ubuntu 22.04 + ROS 2 Humble + Gazebo Fortress입니다. 강화학습팀은 Isaac Lab을 쓰므로 이 빌드 대상이 아닙니다.
 
 ```bash
 source /opt/ros/humble/setup.bash

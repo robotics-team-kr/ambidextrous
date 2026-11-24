@@ -8,6 +8,7 @@ import rclpy
 from rclpy.executors import SingleThreadedExecutor
 
 from . import scene
+from .geometry import Pose
 from .gripper import Gripper
 from .moveit_client import MoveItClient
 from .object_pose import SimObjectPoseSource
@@ -23,7 +24,7 @@ class App:
         self.log = self.node.get_logger()
 
         # 어느 팔을 쓸지는 실행할 때 정합니다:  --ros-args -p arm:=left
-        self.arm = scene.arm_scene(self.node.declare_parameter('arm', 'right').value)
+        self.arm = scene.ArmScene(self.node.declare_parameter('arm', 'right').value)
 
         self.moveit = MoveItClient(self.node)
         self.gripper = Gripper(self.node, self.arm.hand_action, self.arm.finger_joint)
@@ -45,7 +46,8 @@ class App:
         self.gripper.wait_until_ready()
         self.sim.wait_until_ready()
         self.objects.latest(timeout=60.0)
-        self.pick_place.setup_planning_scene()
+        # 테이블을 MoveIt 에 장애물로 등록합니다. 팔이 테이블을 피해 움직이게 됩니다.
+        self.moveit.add_box('table', scene.TABLE_SIZE, Pose(scene.TABLE_CENTER))
         self.log.info('ready')
 
     def shutdown(self):

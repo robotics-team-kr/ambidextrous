@@ -2,7 +2,7 @@ from glob import glob
 
 from setuptools import find_packages, setup
 
-package_name = 'dualarm_pick_place'
+package_name = 'pick_place_damsssss'
 
 setup(
     name=package_name,
@@ -22,8 +22,8 @@ setup(
     license='BSD-3-Clause',
     entry_points={
         'console_scripts': [
-            'pick_place = dualarm_pick_place.pick_place_node:main',
-            'evaluate = dualarm_pick_place.evaluate:main',
+            'pick_place = pick_place_damsssss.pick_place_node:main',
+            'evaluate = pick_place_damsssss.evaluate:main',
         ],
     },
 )

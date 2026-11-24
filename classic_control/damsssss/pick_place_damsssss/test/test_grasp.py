@@ -1,7 +1,7 @@
 import math
 import unittest
 
-from dualarm_pick_place.geometry import (
+from pick_place_damsssss.geometry import (
     Pose,
     box_face_yaw,
     box_tilt,
@@ -9,7 +9,7 @@ from dualarm_pick_place.geometry import (
     quat_multiply,
     rotate_vector,
 )
-from dualarm_pick_place.grasp import (
+from pick_place_damsssss.grasp import (
     TCP_OFFSET,
     GraspError,
     choose_grasp_yaw,
@@ -87,7 +87,7 @@ class TestTopDownGrasp(AssertVec):
 
     def test_fingers_close_across_cube_faces(self):
         cube_yaw = math.radians(25)
-        plan = plan_top_down_grasp(Pose((0.5, -0.3, 0.225), yawed(cube_yaw)))
+        plan = plan_top_down_grasp(Pose((0.5, -0.3, 0.225), yawed(cube_yaw)), 0.12, 0.15)
         finger_axis = rotate_vector(plan.grasp.orientation, (0.0, 1.0, 0.0))
         self.assertAlmostEqual(finger_axis[2], 0.0)
         finger_heading = math.atan2(finger_axis[1], finger_axis[0])
@@ -104,11 +104,11 @@ class TestTopDownGrasp(AssertVec):
     def test_rejects_leaning_object(self):
         leaning = quat_from_axis_angle((1.0, 0.0, 0.0), math.radians(30))
         with self.assertRaises(GraspError):
-            plan_top_down_grasp(Pose((0.5, -0.3, 0.225), leaning))
+            plan_top_down_grasp(Pose((0.5, -0.3, 0.225), leaning), 0.12, 0.15)
 
     def test_accepts_cube_resting_on_another_face(self):
         on_side = quat_from_axis_angle((1.0, 0.0, 0.0), math.pi / 2)
-        plan = plan_top_down_grasp(Pose((0.5, -0.3, 0.225), on_side))
+        plan = plan_top_down_grasp(Pose((0.5, -0.3, 0.225), on_side), 0.12, 0.15)
         self.assert_vec(rotate_vector(plan.grasp.orientation, (0.0, 0.0, 1.0)), (0.0, 0.0, -1.0))
 
 

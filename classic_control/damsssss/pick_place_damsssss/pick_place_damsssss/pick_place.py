@@ -25,10 +25,6 @@ class PickPlace:
         self._log = logger
         self._stage = ''     # 지금 하고 있는 단계 이름
 
-    def setup_planning_scene(self):
-        """테이블을 MoveIt 에 장애물로 등록합니다. 팔이 테이블을 피해 움직이게 됩니다."""
-        self._moveit.add_box('table', scene.TABLE_SIZE, Pose(scene.TABLE_CENTER))
-
     def go_home(self):
         """손을 열고 팔을 기본(ready) 자세로 돌립니다."""
         self._gripper.open()

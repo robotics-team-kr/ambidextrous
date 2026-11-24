@@ -56,8 +56,13 @@ def check_placement(final_pose, place_xy):
     return PlaceCheck(success=(reason == ''), xy_error=xy_error, reason=reason)
 
 
+def meets_target(successes, trials, target_rate=0.8):
+    """성공률이 목표 이상이면 True. 한 번도 시행하지 않았으면 False."""
+    return trials > 0 and successes / trials >= target_rate
+
+
 def summarize(successes, trials, target_rate=0.8):
     """'9/10 succeeded (90%); target 80% -> PASS' 같은 요약 한 줄."""
     rate = successes / trials if trials else 0.0
-    verdict = 'PASS' if trials and rate >= target_rate else 'FAIL'
+    verdict = 'PASS' if meets_target(successes, trials, target_rate) else 'FAIL'
     return f'{successes}/{trials} succeeded ({rate:.0%}); target {target_rate:.0%} -> {verdict}'

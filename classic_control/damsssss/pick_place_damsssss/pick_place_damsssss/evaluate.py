@@ -1,7 +1,7 @@
 """6단계: 여러 번 반복해서 성공률을 잽니다.
 
-    ros2 run dualarm_pick_place evaluate --ros-args -p case:=1 -p trials:=10
-    ros2 run dualarm_pick_place evaluate --ros-args -p case:=2 -p trials:=10 -p seed:=0
+    ros2 run pick_place_damsssss evaluate --ros-args -p case:=1 -p trials:=10
+    ros2 run pick_place_damsssss evaluate --ros-args -p case:=2 -p trials:=10 -p seed:=0
 
 Case 1: 큐브가 항상 고정 위치.
 Case 2: 30 x 30 cm 정사각형 안 무작위 위치 (목표: 10번 중 8번).
@@ -19,7 +19,7 @@ from pathlib import Path
 from . import scene
 from .app import App
 from .geometry import box_face_yaw
-from .trials import check_placement, cube_start_pose, summarize
+from .trials import check_placement, cube_start_pose, meets_target, summarize
 
 COLUMNS = ['trial', 'success', 'start_x', 'start_y', 'start_yaw', 'final_x', 'final_y', 'final_z',
            'xy_error', 'failed_stage', 'reason', 'duration_s']
@@ -105,8 +105,7 @@ def main():
 
         app.log.info(f'Case {case}: {summarize(successes, trials, target_rate)}')
         app.log.info(f'details: {path.resolve()}')
-        passed = trials > 0 and successes / trials >= target_rate
-        return 0 if passed else 1
+        return 0 if meets_target(successes, trials, target_rate) else 1
     finally:
         app.shutdown()
 

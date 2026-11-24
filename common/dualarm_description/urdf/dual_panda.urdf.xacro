@@ -5,7 +5,7 @@
 
   Placeholder until the HW team's spec arrives: swap this file (and the SRDF in
   dualarm_moveit_config) and keep the group / link naming scheme
-  (<side>_panda_arm, <side>_panda_link8) or update dualarm_pick_place/scene.py.
+  (<side>_panda_arm, <side>_panda_link8) or update scene.py in classic_control/damsssss/pick_place_damsssss.
 -->
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="dual_panda">
 

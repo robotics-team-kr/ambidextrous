@@ -9,10 +9,10 @@ import unittest
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-from dualarm_pick_place import scene
-from dualarm_pick_place.grasp import FINGER_OPEN_POSITION, FLANGE_TO_HAND_YAW, TCP_OFFSET
+from pick_place_damsssss import scene
+from pick_place_damsssss.grasp import FINGER_OPEN_POSITION, FLANGE_TO_HAND_YAW, TCP_OFFSET
 
-REPO = Path(__file__).resolve().parents[3]
+REPO = Path(__file__).resolve().parents[4]
 DESCRIPTION = REPO / 'common' / 'dualarm_description'
 MOVEIT_CONFIG = REPO / 'classic_control' / 'dualarm_moveit_config'
 WORLD = DESCRIPTION / 'worlds' / 'pick_place.sdf'
@@ -50,7 +50,7 @@ class TestWorldMatchesScene(unittest.TestCase):
         size = floats(cube.findtext('link/collision/geometry/box/size'))
         self.assertEqual(size, (scene.CUBE_SIZE,) * 3)
         x, y, z = floats(cube.findtext('pose'))[:3]
-        self.assertEqual((x, y), scene.arm_scene('right').fixed_cube_xy)
+        self.assertEqual((x, y), scene.ArmScene('right').fixed_cube_xy)
         self.assertAlmostEqual(z, scene.CUBE_REST_Z)
 
     def test_cube_inertia_is_that_of_a_solid_cube(self):
@@ -66,7 +66,7 @@ class TestWorldMatchesScene(unittest.TestCase):
 
     def test_place_marker_is_at_the_place_target_and_cannot_be_bumped(self):
         marker = self.models['place_target']
-        self.assertEqual(floats(marker.findtext('pose'))[:2], scene.arm_scene('right').place_xy)
+        self.assertEqual(floats(marker.findtext('pose'))[:2], scene.ArmScene('right').place_xy)
         self.assertIsNone(marker.find('link/collision'))
 
 
@@ -119,8 +119,8 @@ class TestRobotModel(unittest.TestCase):
         Independent check that yaw 0 in grasp.py really is how the hand hangs in the
         ready pose, and that tcp_to_flange inverts the URDF's flange -> TCP chain.
         """
-        from dualarm_pick_place.geometry import Pose, quat_from_axis_angle, quat_multiply, rotate_vector
-        from dualarm_pick_place.grasp import tcp_to_flange, top_down_orientation
+        from pick_place_damsssss.geometry import Pose, quat_from_axis_angle, quat_multiply, rotate_vector
+        from pick_place_damsssss.grasp import tcp_to_flange, top_down_orientation
 
         def evaluate(text):
             return [eval(part.replace('${', '').replace('}', ''), {'pi': math.pi})   # noqa: S307
@@ -186,7 +186,7 @@ class TestNamesAgreeAcrossPackages(unittest.TestCase):
 
     def test_srdf_groups_and_ready_state(self):
         for side in ('left', 'right'):
-            arm = scene.arm_scene(side)
+            arm = scene.ArmScene(side)
             group = next(g for g in self.srdf.findall('group') if g.get('name') == arm.group)
             self.assertEqual(group.find('chain').get('tip_link'), arm.flange_link)
             ready = next(s for s in self.srdf.findall('group_state')
@@ -213,7 +213,7 @@ class TestNamesAgreeAcrossPackages(unittest.TestCase):
 
     def test_controllers_cover_the_joints_the_code_commands(self):
         for side in ('left', 'right'):
-            arm = scene.arm_scene(side)
+            arm = scene.ArmScene(side)
             self.assertEqual(tuple(self.controllers[f'{side}_arm_controller']['ros__parameters']['joints']),
                              arm.arm_joints)
             self.assertEqual(self.controllers[f'{side}_hand_controller']['ros__parameters']['joints'],

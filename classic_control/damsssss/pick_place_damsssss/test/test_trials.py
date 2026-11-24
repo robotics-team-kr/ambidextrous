@@ -2,12 +2,12 @@ import math
 import random
 import unittest
 
-from dualarm_pick_place import scene
-from dualarm_pick_place.geometry import Pose, quat_from_axis_angle
-from dualarm_pick_place.trials import check_placement, cube_start_pose, summarize
+from pick_place_damsssss import scene
+from pick_place_damsssss.geometry import Pose, quat_from_axis_angle
+from pick_place_damsssss.trials import check_placement, cube_start_pose, summarize
 
-RIGHT = scene.arm_scene('right')
-LEFT = scene.arm_scene('left')
+RIGHT = scene.ArmScene('right')
+LEFT = scene.ArmScene('left')
 
 
 class TestArmScene(unittest.TestCase):
@@ -45,7 +45,7 @@ class TestArmScene(unittest.TestCase):
 
     def test_rejects_unknown_side(self):
         with self.assertRaises(ValueError):
-            scene.arm_scene('middle')
+            scene.ArmScene('middle')
 
 
 class TestCubeStartPose(unittest.TestCase):

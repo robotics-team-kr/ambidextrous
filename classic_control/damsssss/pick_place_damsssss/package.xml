@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="3">
-  <name>dualarm_pick_place</name>
+  <name>pick_place_damsssss</name>
   <version>0.1.0</version>
   <description>Classic-control pick and place of a cube with one arm of the dual-arm robot, plus success-rate evaluation.</description>
   <maintainer email="todo@example.com">classic control team</maintainer>
